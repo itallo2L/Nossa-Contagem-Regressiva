@@ -1,0 +1,508 @@
+<title>Nossa Contagem Regressiva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Parisienne&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #fbf3e7;
+    --cream-deep: #f2e3ce;
+    --paper-line: #e9d8bd;
+    --terracotta: #b85c38;
+    --terracotta-deep: #8a3f22;
+    --ink: #3d2c22;
+    --ink-soft: #6b5644;
+    --sage: #7c8a5e;
+    --blush: #e7c3a1;
+    --shadow: rgba(61,44,34,0.16);
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Jost', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  ::selection{ background:var(--blush); color:var(--terracotta-deep); }
+
+  a{ color:inherit; }
+
+  .wrap{
+    max-width: 980px;
+    margin:0 auto;
+    padding: 0 clamp(20px, 5vw, 56px);
+  }
+
+  /* ---------- background paper texture ---------- */
+  .paper{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(184,92,56,0.07), transparent 40%),
+      radial-gradient(circle at 84% 78%, rgba(124,138,94,0.08), transparent 45%),
+      var(--cream);
+  }
+  .paper::after{
+    content:"";
+    position:absolute; inset:0;
+    background-image: radial-gradient(rgba(61,44,34,0.05) 1px, transparent 1px);
+    background-size: 3px 3px;
+    opacity:0.5;
+  }
+
+  /* ---------- corner ornaments ---------- */
+  .ornament{
+    position:absolute;
+    width: clamp(90px, 14vw, 160px);
+    height:auto;
+    color: var(--sage);
+    opacity:0.75;
+  }
+  .ornament.tl{ top: 18px; left: 18px; }
+  .ornament.br{ bottom: 18px; right: 18px; transform: rotate(180deg); }
+  .ornament path{ fill:none; stroke:currentColor; stroke-width:1.1; stroke-linecap:round; }
+  .ornament .accent{ stroke: var(--terracotta); }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    padding: clamp(84px,14vw,140px) 0 clamp(56px,8vw,88px);
+    text-align:center;
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    font-size:0.72rem;
+    letter-spacing:0.32em;
+    text-transform:uppercase;
+    color: var(--terracotta-deep);
+    font-weight:500;
+  }
+  .eyebrow::before,.eyebrow::after{
+    content:"";
+    width:26px; height:1px;
+    background: var(--terracotta);
+    opacity:0.6;
+  }
+
+  h1{
+    font-family:'Cormorant Garamond', 'Georgia', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size: clamp(2.6rem, 6.4vw, 4.6rem);
+    line-height:1.06;
+    margin: 22px 0 18px;
+    color: var(--terracotta-deep);
+    text-wrap: balance;
+  }
+
+  .hero p.lede{
+    max-width:34ch;
+    margin: 0 auto;
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    line-height:1.65;
+  }
+
+  .script-line{
+    font-family:'Parisienne', cursive;
+    color: var(--terracotta);
+    font-size: 1.5rem;
+    display:block;
+    margin-top:6px;
+  }
+
+  /* ---------- countdown ---------- */
+  .countdown{
+    margin: clamp(48px,8vw,72px) auto 0;
+    display:grid;
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 720px;
+    position:relative;
+  }
+
+  .tile{
+    position:relative;
+    padding: 6px 8px;
+  }
+
+  .tile + .tile::before{
+    content:"";
+    position:absolute;
+    left:0; top:14%;
+    width:1px; height:72%;
+    background: var(--paper-line);
+  }
+
+  .tile .num{
+    font-family:'Jost', sans-serif;
+    font-weight:600;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(1.9rem, 5.4vw, 3.2rem);
+    color: var(--ink);
+    line-height:1;
+  }
+
+  .tile .label{
+    display:block;
+    margin-top:10px;
+    font-size:0.66rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width:560px){
+    .countdown{ grid-template-columns: repeat(3, 1fr); row-gap:28px; max-width:420px; }
+    .tile:nth-child(4)::before, .tile:nth-child(1)::before{ display:none; }
+  }
+
+  .date-detail{
+    margin-top: clamp(28px,5vw,40px);
+    font-size:0.78rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color: var(--sage);
+    font-weight:500;
+  }
+
+  .divider{
+    width:1px;
+    height:40px;
+    margin: 20px auto 0;
+    background: linear-gradient(to bottom, transparent, var(--terracotta), transparent);
+    opacity:0.6;
+  }
+
+  /* ---------- section shell ---------- */
+  section.block{ padding: clamp(40px,8vw,64px) 0; }
+  .section-head{ text-align:center; margin-bottom: clamp(32px,6vw,52px); }
+  .section-head h2{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    margin: 10px 0 0;
+    color: var(--terracotta-deep);
+  }
+
+  /* ---------- carousel ---------- */
+  .carousel-shell{
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .frame{
+    position:relative;
+    border: 1px solid var(--paper-line);
+    padding: 14px;
+    background: var(--cream);
+    box-shadow: 0 24px 48px -24px var(--shadow);
+  }
+
+  .frame-inner{
+    position:relative;
+    aspect-ratio: 4 / 5;
+    overflow:hidden;
+    border: 1px solid var(--terracotta);
+    outline: 1px solid var(--cream);
+    outline-offset: -6px;
+  }
+
+  .slide{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0;
+    transform: scale(1.06);
+    transition: opacity 1.4s ease, transform 6s ease;
+    pointer-events:none;
+  }
+  .slide.active{
+    opacity:1;
+    transform: scale(1);
+    transition: opacity 1.4s ease, transform 6s ease-out;
+    pointer-events:auto;
+  }
+
+  .slide .wash{ position:absolute; inset:0; }
+  .slide:nth-child(1) .wash{ background: linear-gradient(155deg, #e7c3a1, #b85c38 120%); }
+  .slide:nth-child(2) .wash{ background: linear-gradient(155deg, #d9c9a3, #7c8a5e 120%); }
+  .slide:nth-child(3) .wash{ background: linear-gradient(155deg, #ecd9c2, #8a3f22 120%); }
+  .slide:nth-child(4) .wash{ background: linear-gradient(155deg, #d8ddc4, #b85c38 120%); }
+
+  .slide .mark{
+    position:relative;
+    color: rgba(255,255,255,0.9);
+    width: 34%;
+  }
+  .slide .mark svg{ width:100%; height:auto; }
+
+  .slide .tag{
+    position:absolute;
+    left:14px; top:14px;
+    font-size:0.62rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color: rgba(255,255,255,0.85);
+    background: rgba(61,44,34,0.28);
+    padding: 5px 9px;
+    backdrop-filter: blur(2px);
+  }
+
+  .caption{
+    text-align:center;
+    margin-top:18px;
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:1.2rem;
+    color: var(--ink-soft);
+    min-height: 1.6em;
+  }
+
+  .carousel-nav{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+    margin-top:16px;
+  }
+
+  .nav-btn{
+    background:none; border:none; cursor:pointer;
+    color: var(--terracotta-deep);
+    width:34px; height:34px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    transition: background 0.2s ease;
+  }
+  .nav-btn:hover{ background: var(--cream-deep); }
+  .nav-btn:focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
+  .nav-btn svg{ width:16px; height:16px; }
+
+  .dots{ display:flex; gap:8px; }
+  .dot{
+    width:7px; height:7px; border-radius:50%;
+    background: var(--paper-line);
+    border:none; padding:0; cursor:pointer;
+  }
+  .dot.active{ background: var(--terracotta); }
+  .dot:focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
+
+  /* ---------- closing ---------- */
+  .closing{
+    text-align:center;
+    padding: clamp(56px,10vw,88px) 0 clamp(64px,10vw,96px);
+  }
+  .closing .script-line{ font-size: clamp(1.8rem, 4vw, 2.4rem); }
+  .closing p{
+    max-width:38ch;
+    margin: 14px auto 0;
+    color: var(--ink-soft);
+    line-height:1.6;
+  }
+  footer{
+    text-align:center;
+    padding: 20px 0 40px;
+    font-size:0.68rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color: var(--sage);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .slide{ transition: opacity 0.6s ease; transform:none !important; }
+    .slide.active{ transition: opacity 0.6s ease; }
+  }
+</style>
+
+<div class="paper"></div>
+
+<main>
+  <section class="hero wrap">
+    <svg class="ornament tl" viewBox="0 0 160 160" aria-hidden="true">
+      <path d="M4 4 C 30 6, 46 22, 48 48" />
+      <path d="M14 10 C 34 18, 40 34, 40 52" />
+      <path class="accent" d="M48 48 C 60 46, 70 50, 76 60" />
+      <path d="M22 28 C 30 26, 36 30, 38 38" />
+      <path d="M4 4 L 4 34 M4 4 L 34 4" stroke-width="1.3" />
+    </svg>
+    <svg class="ornament br" viewBox="0 0 160 160" aria-hidden="true">
+      <path d="M4 4 C 30 6, 46 22, 48 48" />
+      <path d="M14 10 C 34 18, 40 34, 40 52" />
+      <path class="accent" d="M48 48 C 60 46, 70 50, 76 60" />
+      <path d="M22 28 C 30 26, 36 30, 38 38" />
+      <path d="M4 4 L 4 34 M4 4 L 34 4" stroke-width="1.3" />
+    </svg>
+
+    <span class="eyebrow">22 de agosto de 2027</span>
+    <h1>Nossa Contagem<br>Regressiva</h1>
+    <p class="lede">Cada segundo que passa é um segundo mais perto do nosso sim.</p>
+
+    <div class="countdown" id="countdown" role="timer" aria-live="polite" aria-atomic="true">
+      <div class="tile"><span class="num" id="cd-months">00</span><span class="label">Meses</span></div>
+      <div class="tile"><span class="num" id="cd-days">00</span><span class="label">Dias</span></div>
+      <div class="tile"><span class="num" id="cd-hours">00</span><span class="label">Horas</span></div>
+      <div class="tile"><span class="num" id="cd-minutes">00</span><span class="label">Minutos</span></div>
+      <div class="tile"><span class="num" id="cd-seconds">00</span><span class="label">Segundos</span></div>
+    </div>
+
+    <div class="divider"></div>
+    <span class="date-detail">22 · 08 · 2027 — 16h</span>
+  </section>
+
+  <section class="block wrap">
+    <div class="section-head">
+      <span class="eyebrow">Nossa história</span>
+      <h2>Um pouco de nós dois</h2>
+    </div>
+
+    <div class="carousel-shell">
+      <div class="frame">
+        <div class="frame-inner" id="frame-inner">
+          <div class="slide active">
+            <span class="tag">Adicione uma foto sua aqui</span>
+            <div class="wash"></div>
+            <div class="mark">
+              <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M50 82C30 68 12 52 12 34 12 22 21 14 32 14c8 0 14 4 18 11 4-7 10-11 18-11 11 0 20 8 20 20 0 18-18 34-38 48Z"/></svg>
+            </div>
+          </div>
+          <div class="slide">
+            <span class="tag">Adicione uma foto sua aqui</span>
+            <div class="wash"></div>
+            <div class="mark">
+              <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M50 82C30 68 12 52 12 34 12 22 21 14 32 14c8 0 14 4 18 11 4-7 10-11 18-11 11 0 20 8 20 20 0 18-18 34-38 48Z"/></svg>
+            </div>
+          </div>
+          <div class="slide">
+            <span class="tag">Adicione uma foto sua aqui</span>
+            <div class="wash"></div>
+            <div class="mark">
+              <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M50 82C30 68 12 52 12 34 12 22 21 14 32 14c8 0 14 4 18 11 4-7 10-11 18-11 11 0 20 8 20 20 0 18-18 34-38 48Z"/></svg>
+            </div>
+          </div>
+          <div class="slide">
+            <span class="tag">Adicione uma foto sua aqui</span>
+            <div class="wash"></div>
+            <div class="mark">
+              <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M50 82C30 68 12 52 12 34 12 22 21 14 32 14c8 0 14 4 18 11 4-7 10-11 18-11 11 0 20 8 20 20 0 18-18 34-38 48Z"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="caption" id="caption">Onde tudo começou</p>
+
+      <div class="carousel-nav">
+        <button class="nav-btn" id="prevBtn" aria-label="Foto anterior">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn" aria-label="Próxima foto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing wrap">
+    <span class="script-line">até breve, meu amor</span>
+    <p>22 de agosto de 2027 será o dia em que tudo o que já vivemos ganha um novo começo.</p>
+  </section>
+
+  <footer>Nossa contagem regressiva · 22.08.2027</footer>
+</main>
+
+<script>
+(function(){
+  // ---------- countdown ----------
+  var target = new Date('2027-08-22T16:00:00-03:00');
+
+  function addMonths(date, n){
+    var d = new Date(date.getTime());
+    d.setMonth(d.getMonth() + n);
+    return d;
+  }
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function computeCountdown(now, target){
+    if (target <= now) return { done:true, months:0, days:0, hours:0, minutes:0, seconds:0 };
+    var months = 0;
+    var cursor = new Date(now.getTime());
+    while(true){
+      var next = addMonths(cursor, 1);
+      if (next <= target){ months++; cursor = next; } else break;
+    }
+    var remainderMs = target - cursor;
+    var totalSeconds = Math.floor(remainderMs / 1000);
+    var days = Math.floor(totalSeconds / 86400); totalSeconds -= days*86400;
+    var hours = Math.floor(totalSeconds / 3600); totalSeconds -= hours*3600;
+    var minutes = Math.floor(totalSeconds / 60); totalSeconds -= minutes*60;
+    var seconds = totalSeconds;
+    return { done:false, months:months, days:days, hours:hours, minutes:minutes, seconds:seconds };
+  }
+
+  var elMonths = document.getElementById('cd-months');
+  var elDays = document.getElementById('cd-days');
+  var elHours = document.getElementById('cd-hours');
+  var elMinutes = document.getElementById('cd-minutes');
+  var elSeconds = document.getElementById('cd-seconds');
+
+  function tick(){
+    var c = computeCountdown(new Date(), target);
+    elMonths.textContent = pad(c.months);
+    elDays.textContent = pad(c.days);
+    elHours.textContent = pad(c.hours);
+    elMinutes.textContent = pad(c.minutes);
+    elSeconds.textContent = pad(c.seconds);
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  // ---------- carousel ----------
+  var slides = document.querySelectorAll('.slide');
+  var dotsWrap = document.getElementById('dots');
+  var caption = document.getElementById('caption');
+  var captions = ['Onde tudo começou', 'Nosso dia a dia', 'O pedido de casamento', 'Rumo ao altar'];
+  var current = 0;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var timer = null;
+
+  slides.forEach(function(_, i){
+    var b = document.createElement('button');
+    b.className = 'dot' + (i === 0 ? ' active' : '');
+    b.setAttribute('aria-label', 'Ir para a foto ' + (i+1));
+    b.addEventListener('click', function(){ goTo(i); restart(); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = dotsWrap.querySelectorAll('.dot');
+
+  function goTo(i){
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (i + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    caption.textContent = captions[current] || '';
+  }
+
+  function next(){ goTo(current + 1); }
+  function prev(){ goTo(current - 1); }
+
+  document.getElementById('nextBtn').addEventListener('click', function(){ next(); restart(); });
+  document.getElementById('prevBtn').addEventListener('click', function(){ prev(); restart(); });
+
+  function restart(){
+    if (timer) clearInterval(timer);
+    if (!reduced) timer = setInterval(next, 5000);
+  }
+  restart();
+})();
+</script>
