@@ -309,19 +309,19 @@
 
   .nav-btn{
     background:none; border:none; cursor:pointer;
-    color: var(--terracotta-deep);
+    color: #ffffff;
     width:34px; height:34px;
     display:flex; align-items:center; justify-content:center;
     border-radius:50%;
     transition: background 0.2s ease;
   }
-  .nav-btn:hover{ background: var(--blush); }
-  .nav-btn:focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
+  .nav-btn:hover{ background: rgba(255,255,255,0.2); }
+  .nav-btn:focus-visible{ outline:2px solid #ffffff; outline-offset:2px; }
   .nav-btn svg{ width:16px; height:16px; }
 
   .dots{ display:flex; gap:8px; }
-  .dot{ width:7px; height:7px; border-radius:50%; background: var(--paper-line); border:none; padding:0; cursor:pointer; }
-  .dot.active{ background: var(--terracotta); }
+  .dot{ width:7px; height:7px; border-radius:50%; background: rgba(255,255,255,0.45); border:none; padding:0; cursor:pointer; }
+  .dot.active{ background: #ffffff; }
   .dot:focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
 
   /* ---------- vow section (photo background, echoes hero treatment) ---------- */
@@ -689,23 +689,42 @@
       if (target !== null){ commit(target); e.preventDefault(); }
     }, { passive:false });
 
-    var touchStartY = null;
+    var touchStartX = null, touchStartY = null, touchDirection = null; // 'v' | 'h' | null (undecided)
     window.addEventListener('touchstart', function(e){
+      touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
+      touchDirection = null;
     }, { passive:true });
 
     window.addEventListener('touchmove', function(e){
       if (touchStartY === null) return;
-      if (transitioning){ e.preventDefault(); return; }
+      if (transitioning){
+        if (touchDirection === 'v') e.preventDefault();
+        return;
+      }
+      var dx = touchStartX - e.touches[0].clientX;
       var dy = touchStartY - e.touches[0].clientY; // >0 => finger moved up => scroll down intent
+
+      if (touchDirection === null){
+        // wait until the gesture is clearly one direction or the other before deciding
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+        touchDirection = Math.abs(dy) > Math.abs(dx) ? 'v' : 'h';
+      }
+      if (touchDirection === 'h') return; // horizontal swipe (e.g. carousel photos) — never treat as a section change
+
       if (Math.abs(dy) < 10) return;
       var target = resolveTarget(dy);
       if (target !== null){
         commit(target);
         e.preventDefault();
+        touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
       }
     }, { passive:false });
+
+    window.addEventListener('touchend', function(){
+      touchStartX = touchStartY = touchDirection = null;
+    }, { passive:true });
   })();
 })();
 </script>
